@@ -17,11 +17,19 @@ class TestClass:
         return
 
 ```
-The setup and tear down methods run at the beginning and end respetively of each test.*The naming conversion should be the same for it to apply.*. The method refers to the test that is beign run. 
+The setup and tear down methods run at the beginning and end respetively of each test.**The naming conversion should be the same for it to apply.** The method refers to the test that is beign run. 
 `pytest -s test.py`
 
 # Fixtures
 In classes we have setup and tear down. But normal function tests fixtures
 ```python
+ @pytest.fixture
+def initiator():
+    return str()
 
+def test1():
+    initiator().check()
+
+def test2():
+    initiator().check()
 ```
