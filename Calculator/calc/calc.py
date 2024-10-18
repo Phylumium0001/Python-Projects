@@ -19,6 +19,12 @@ class Calculator:
             result *= i
         return result
     
+    def modulos(self, arg1, arg2):
+        return arg1 % arg2
+    
+    def power(self,number,power):
+        return number ** power
+
     
 if __name__ == "__main__":
     c = Calculator()
