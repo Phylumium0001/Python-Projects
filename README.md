@@ -11,3 +11,9 @@
 
 - ## Minesweeper
   The classic minesweeper in tkinter
+
+- ## File Organiser script
+  The scripts organizes common files in the directory into their corresponding folders
+
+- ## Finance Tracker
+  
