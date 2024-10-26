@@ -51,14 +51,14 @@ class Database:
         
     def get_amount_by_category(self,category):
         with self.conn:
-            cat_trans = self.c.execute(f"SELECT amount FROM expenses WHERE category='{category}'")
+            cat_trans = self.c.execute(f"SELECT amount,description FROM expenses WHERE category='{category}'")
             return cat_trans.fetchall()
         
 if __name__ == "__main__":
     db = Database()
     # db.add_purchase(12,"New","21/01/2023","NewBook")
     db.update_category(1,"Work")
-    for data in db.get_amount_by_category("Food"):
-        print(data)
+    for data in db.get_amount_by_category("Work"):
+        print(data[0])
 
     # print(db.get_all_data())

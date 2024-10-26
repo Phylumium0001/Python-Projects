@@ -21,20 +21,23 @@ class Application(tk.Tk):
         frame2 = TreeViewFrame(self)
         frame1 = InsertDetailsFrame(self,frame2)
 
-        frame1.grid(row=0,column=0,pady=10,sticky="wn")
+        frame1.grid(row=0,column=0,ipadx=10,ipady=10,sticky="wn")
 
-        frame2.grid(row=1,column=0,sticky="nsew")
+        frame2.grid(row=1,column=0,ipadx=10,ipady=10,sticky="nsew")
 
 
 class InsertDetailsFrame(ttk.LabelFrame):
     def __init__(self,parent,tree):
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+
         self.tree = tree
         self.f = Finance()
         super().__init__(parent)
         self.config(text="Add Purchase")
 
         self.amount_label = ttk.Label(self,text="Amount($)")
-        self.amount_label.grid(row=0,column=0,ipadx=2)
+        self.amount_label.grid(row=0,column=0)
 
         self.amount_entry = ttk.Entry(self)
         self.amount_entry.grid(row=0,column=1)
@@ -52,13 +55,13 @@ class InsertDetailsFrame(ttk.LabelFrame):
         self.empty_space2.grid(row=0,column=5,padx=15)
 
         self.add_purchase_btn = ttk.Button(self, text="Add",command=self.submit_expense)
-        self.add_purchase_btn.grid(row=0,column=6,padx=5)
+        self.add_purchase_btn.grid(row=0,column=6,pady=10)
 
         self.description_label = ttk.Label(self,text="Description")
-        self.description_label.grid(row=1,column=0,padx=10)
+        self.description_label.grid(row=1,column=0,ipady=10,sticky="s")
 
         self.description_entry = ttk.Entry(self,width=20)
-        self.description_entry.grid(row=1,column=1,columnspan=6,sticky="ew")
+        self.description_entry.grid(row=1,column=1,columnspan=6,ipady=5,sticky="ews")
 
 
     def submit_expense(self,_event=None):

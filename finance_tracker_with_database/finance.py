@@ -24,8 +24,15 @@ class Finance:
             total += i[0]
         return total
             
-    def get_total_amount_by_category(category):
-        pass
+    def get_total_amount_by_category(self,category):
+        vals = self.db.get_amount_by_category(category)
+        total = 0
+        if vals:
+            for val in vals:
+                total += val[0]
+            return total
+        else:
+            raise Exception("Invalid category")
 
 if __name__ == "__main__":
     f = Finance()
@@ -33,3 +40,4 @@ if __name__ == "__main__":
     values = f.get_all_values()
     print(values)
     f.get_total_amount_spent()
+    print(f.get_total_amount_by_category("Work"))
