@@ -100,11 +100,22 @@ class SideBarFrame(ttk.Frame):
         self.description_entry.delete(0,tk.END)
         self.category_entry.delete(0,tk.END)
 
+    def add_to_fields(self,data):
+        id,amount,category,date,description = data
+        self.clear_fields()
+        
+        self.amount_entry.insert(0,amount)
+        self.date_entry.insert(0,date)
+        self.description_entry.insert(0,description)
+        self.category_entry.insert(0,category)
+
 class OptionsFrame(ttk.Frame):
     def __init__(self,parent,tree,side_bar):
         super().__init__(parent)
         self.tree = tree.get_tree()
+        self.tree_view = tree
         self.side_bar = side_bar
+        self.f = Finance()
 
         self.config(padding=10)
         # Buttons
@@ -120,12 +131,20 @@ class OptionsFrame(ttk.Frame):
         self.delete_expense_btn = ttk.Button(self,text="Delete Selected Expense",width=30)
         self.delete_expense_btn.grid(row=1,column=0)
 
-        self.delete_all_expenses = ttk.Button(self,text="View Selected Expense Details",width=30)
+        self.delete_all_expenses = ttk.Button(self,text="Delete All Expenses",width=30,command=self.delete_all_expenses)
         self.delete_all_expenses.grid(row=1,column=1)
 
     def view_expense(self):
         selected_row = self.tree.selection()
-        print(selected_row)
+        if selected_row:
+            item_data = self.tree.item(selected_row[0], "values")
+            self.side_bar.add_to_fields(item_data)
+
+    def delete_all_expenses(self):
+        self.f.delete_all_entries()
+        self.f.recreate_table()
+        self.tree_view.reload_tree()
+        
 
 class TreeFrame(ttk.Frame):
     def __init__(self,parent):

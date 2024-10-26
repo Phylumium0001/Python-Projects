@@ -34,6 +34,11 @@ class Finance:
         else:
             raise Exception("Invalid category")
 
+    def delete_all_entries(self):
+        self.db.delete_all_entries()
+
+    def recreate_table(self):
+        self.db.create_table()
 if __name__ == "__main__":
     f = Finance()
     f.add_expenses([20,"Food","12/02/2024","Bought"])

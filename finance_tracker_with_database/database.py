@@ -5,14 +5,17 @@ class Database:
         self.conn = sqlite3.connect("my_db.db")
         self.c = self.conn.cursor()
         # Create the table
-        self.c.execute("""CREATE TABLE IF NOT EXISTS expenses (
+        self.create_table()
+        
+    def create_table(self):
+        with self.conn:
+            self.c.execute("""CREATE TABLE IF NOT EXISTS expenses (
                 id INTEGER PRIMARY KEY,
                 amount REAL,
                 category TEXT,
                 date TEXT,
                 description TEXT
             );""")
-        
 
     def add_purchase(self,amount, category,date,description):
         if amount != "" and category != "":
@@ -56,6 +59,11 @@ class Database:
             cat_trans = self.c.execute(f"SELECT amount,description FROM expenses WHERE category='{category}'")
             return cat_trans.fetchall()
         
+    def delete_all_entries(self):
+        with self.conn:
+            self.c.execute(f"DROP TABLE expenses")
+
+
 if __name__ == "__main__":
     db = Database()
     # db.add_purchase(12,"New","21/01/2023","NewBook")
