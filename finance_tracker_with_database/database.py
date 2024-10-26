@@ -15,9 +15,11 @@ class Database:
         
 
     def add_purchase(self,amount, category,date,description):
-        with self.conn:
-            self.c.execute(f"INSERT INTO expenses (amount,category,date,description) VALUES ('{amount}','{category}','{date}','{description}')")
-
+        if amount != "" and category != "":
+            with self.conn:
+                self.c.execute(f"INSERT INTO expenses (amount,category,date,description) VALUES ('{amount}','{category}','{date}','{description}')")
+        else:
+            raise Exception("Invalid Info")
     def get_all_data(self):
         with self.conn:
             values = self.c.execute("SELECT * FROM expenses").fetchall()
