@@ -191,8 +191,8 @@ except TimeoutError:
 5. Start simple, then add features
 
 ## Essential Checklist
-- [ ] Understanding of IP addresses and ports
-- [ ] Basic client-server communication
+- [-] Understanding of IP addresses and ports
+- [-] Basic client-server communication
 - [ ] Message encoding/decoding
 - [ ] Error handling implementation
 - [ ] Multiple client support
