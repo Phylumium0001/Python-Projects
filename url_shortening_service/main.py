@@ -24,6 +24,15 @@ def add_new_url(url, db_obj):
     db_obj.add_new_url(short_url, url)
 
 
+def expand_url(short_url, db_obj):
+    # Retrieve the url representation from the db
+    try:
+        corresponding_link = db_obj.find_url(short_url)
+        print(corresponding_link)
+    except Exception as e:
+        print(e)
+
+
 def show_all_urls(db_obj):
     res = db_obj.show_all_urls()
     print(res)
@@ -36,12 +45,19 @@ if __name__ == "__main__":
     while True:
         response = input(
             "[1] Shorten link\n[2] Expand link\n[3] Show database \n[4] Quit\n> ")
+
         if response == "1":
             url = input("Enter Url > ")
             add_new_url(url, db_obj)
 
         elif response == "2":
-            pass
+            short_url = input("Enter short Url > ")
+            try:
+                url = expand_url(short_url, db_obj)
+            except Exception as e:
+                url = None
+                print(e)
+            print(url)
 
         elif response == "3":
             show_all_urls(db_obj)

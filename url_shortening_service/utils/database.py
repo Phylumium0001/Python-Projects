@@ -101,6 +101,21 @@ class Database:
             print(f"{e}")
         self.close_conn(conn)
 
+    def find_url(self, short_url):
+        try:
+            conn, c = self.setup_conn()
+            c.execute(f"""
+                SELECT * FROM urls WHERE
+                short_url='{short_url}'
+                """)
+            return c.fetchone()[1]
+
+        except Exception as e:
+            print("Url Not Found")
+            return None
+
+        self.close_conn(conn)
+
 
 if __name__ == "__main__":
     db = Database()
