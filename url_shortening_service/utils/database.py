@@ -98,7 +98,9 @@ class Database:
             """)
             conn.commit()
         except sql.IntegrityError as e:
-            print(f"{e}")
+            print(f"{e}: Url Exists")
+            print(short_url)
+
         self.close_conn(conn)
 
     def find_url(self, short_url):

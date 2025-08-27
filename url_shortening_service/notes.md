@@ -20,3 +20,7 @@ Each User will have a unique id that will contribute in generating the short url
 - Random values from capital to lower case, and numbers from 0 to 9 make up the user_id
 - When an id is created, it is compared to the database to check for existing one.
 
+
+# TODO
+[ x ] - Add option for adding the user id to short url
+[ x ] - Prevent duplicate links

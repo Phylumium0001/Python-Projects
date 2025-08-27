@@ -6,18 +6,24 @@ from utils.user_id import generate_user_id
 from utils.database import Database
 
 
-def add_new_url(url, db_obj):
+def add_new_url(url, db_obj,add_user_id=False):
     # Normalize
     normalized_url = normalize_url(url)
 
     # Hash and obtain key
     hash_value = generate_hash_value(normalized_url)
 
-    # Get User_id
-    user_id = generate_user_id()
+    if add_user_id:
+        # Add user id to url
+        # Get User_id
+        user_id = generate_user_id()
 
-    # Generate short Url
-    short_url = generate_url(hash_value, user_id)
+        # Generate short Url
+        short_url = generate_url(hash_value, user_id)
+
+    else:
+        short_url = generate_url(hash_value)
+
     print(short_url)
 
     # Store in Db
