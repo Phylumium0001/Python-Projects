@@ -6,7 +6,7 @@ from utils.user_id import generate_user_id
 from utils.database import Database
 
 
-def add_new_url(url, db_obj,add_user_id=False):
+def add_new_url(url, db_obj, add_user_id=False):
     # Normalize
     normalized_url = normalize_url(url)
 
@@ -41,7 +41,9 @@ def expand_url(short_url, db_obj):
 
 def show_all_urls(db_obj):
     res = db_obj.show_all_urls()
-    print(res)
+    print("Shorten links > Original Links")
+    for url in res:
+        print(f"{url[0]} > {url[1]}")
 
 
 if __name__ == "__main__":
