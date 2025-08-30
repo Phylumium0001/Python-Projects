@@ -154,7 +154,7 @@ def unshorten(short_code: str):
 
 @app.get("/api/urls")
 def get_urls():
-    urls = db.show_all_urls()
+    urls = db.get_all_url()
     print(urls)
     # res = []
     # for url in urls:
