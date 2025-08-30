@@ -130,8 +130,8 @@ def home():
 
 
 def get_url_from_db(short_code: str):
-    # This logic can be reused by both endpoints
-    res = db.find_url(short_code)
+    short_url = "shlk.com/" + short_code
+    res = db.find_url(short_url)
     if not res:
         raise HTTPException(status_code=404, detail="Item Not Found")
     return res
