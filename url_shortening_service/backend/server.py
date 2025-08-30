@@ -8,6 +8,7 @@ from utils.hash_url import generate_hash_value
 from utils.normalize import normalize_url
 from utils.database import Database
 
+db = Database()
 app = FastAPI()
 
 html_home = """<!DOCTYPE html>
@@ -128,60 +129,36 @@ def home():
 # GET /<shortcode>
 
 
+def get_url_from_db(short_code: str):
+    # This logic can be reused by both endpoints
+    res = db.find_url(short_code)
+    if not res:
+        raise HTTPException(status_code=404, detail="Item Not Found")
+    return res
+
+
 @app.get("/api/{short_code}")
 def unshorten_api(short_code: str):
-    # Will send the response
-    url = "shlk.com/" + short_code
-
-    # Match Found
-    db = Database()
-    res = db.find_url(url)
-
-    if not res:
-        # Match Not Found
-        raise HTTPException(status_code=404, detail="Item Not Found")
-
-    # Redirect the user to the page :  RedirectResponse(url)
-    short_url, long_url = res
-
-    return {"short_url": short_url, "long_url": long_url}
-
-    # return {"long_url": long_url, "short_url": short_url}
+    long_url = get_url_from_db(short_code)
+    # This endpoint returns JSON
+    return {"short_url": short_code, "long_url": long_url}
 
 
 @app.get("/{short_code}")
 def unshorten(short_code: str):
-    # Will redirect
-    url = "shlk.com/" + short_code
-
-    # Match Found
-    db = Database()
-    res = db.find_url(url)
-
-    if not res:
-        # Match Not Found
-        raise HTTPException(status_code=404, detail="Item Not Found")
-
-    # Redirect the user to the page :  RedirectResponse(url)
-    short_url, long_url = res
+    long_url = get_url_from_db(short_code)
+    # This endpoint redirects the user
     return RedirectResponse(url=long_url, status_code=307)
-
-    # return {"long_url": long_url, "short_url": short_url}
-
-
 # POST /shorten
 
 
-@app.post("/shorten")
-def shorten(long_url: URLRequest) -> URLResponse:
+@app.post("/shorten", response_model=URLResponse)
+def shorten(long_url: URLRequest):
     normalized_url = normalize_url(long_url.long_url)
-    hash = generate_hash_value(normalized_url)
-    short_url = generate_url(hash)
+    hash_value = generate_hash_value(normalized_url)
+    short_url = generate_url(hash_value)
 
-    # TODO : Store to database
+    db.add_new_url(short_url, long_url.long_url)
 
-    # Return the Response
-    if not short_url:
-        raise HTTPException(status_code=400, detail="Failed to shorten")
-
-    return {"short_url": short_url, "long_url": long_url.long_url}
+    # Return an instance of the Pydantic model
+    return URLResponse(short_url=short_url, long_url=long_url.long_url)
