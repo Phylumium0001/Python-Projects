@@ -97,7 +97,7 @@ html_home = """<!DOCTYPE html>
 
                 console.log(data)
                 if (response.ok){
-                    resultDiv.innerHTML = `<p>Your short URL is <a href='${data.short_url}' target='_blank'>${data.short_url}</a></p>`
+                    resultDiv.innerHTML = `<p>Your short URL is <a href='${data.short_url.replace("shlk.com/","")}' target='_blank'>${data.short_url}</a></p>`
                 }else{
                     resultDiv.innerHTML = `<p style="color:red">Error: ${data.detail}</p>`
                 }
@@ -149,6 +149,17 @@ def unshorten(short_code: str):
     long_url = get_url_from_db(short_code)
     # This endpoint redirects the user
     return RedirectResponse(url=long_url, status_code=307)
+
+
+@app.get("/api/urls")
+def get_urls() -> list[URLResponse]:
+    urls = db.show_all_urls()
+    res = []
+    for url in urls:
+        res.append(URLResponse(short_url=url[0], long_url=url[1]))
+
+    return res
+
 # POST /shorten
 
 
