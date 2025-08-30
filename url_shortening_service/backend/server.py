@@ -97,7 +97,7 @@ html_home = """<!DOCTYPE html>
 
                 console.log(data)
                 if (response.ok){
-                    resultDiv.innerHTML = `<p>Your short URL is <a href='${data.short_url}' target='_blank'>${data.short_url}</a></p>`
+                    resultDiv.innerHTML = `<p>Your short URL is <a href='${data.short_url.replace("shlk.com/","")}' target='_blank'>${data.short_url}</a></p>`
                 }else{
                     resultDiv.innerHTML = `<p style="color:red">Error: ${data.detail}</p>`
                 }
@@ -130,8 +130,8 @@ def home():
 
 
 def get_url_from_db(short_code: str):
-    # This logic can be reused by both endpoints
-    res = db.find_url(short_code)
+    short_url = "shlk.com/" + short_code
+    res = db.find_url(short_url)
     if not res:
         raise HTTPException(status_code=404, detail="Item Not Found")
     return res
@@ -146,9 +146,22 @@ def unshorten_api(short_code: str):
 
 @app.get("/{short_code}")
 def unshorten(short_code: str):
+    print(short_code)
     long_url = get_url_from_db(short_code)
     # This endpoint redirects the user
     return RedirectResponse(url=long_url, status_code=307)
+
+
+@app.get("/api/urls")
+def get_urls():
+    urls = db.get_all_url()
+    print(urls)
+    # res = []
+    # for url in urls:
+    #     res.append(URLResponse(short_url=url[0], long_url=url[1]))
+
+    return urls
+
 # POST /shorten
 
 
