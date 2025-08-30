@@ -146,6 +146,7 @@ def unshorten_api(short_code: str):
 
 @app.get("/{short_code}")
 def unshorten(short_code: str):
+    print(short_code)
     long_url = get_url_from_db(short_code)
     # This endpoint redirects the user
     return RedirectResponse(url=long_url, status_code=307)
