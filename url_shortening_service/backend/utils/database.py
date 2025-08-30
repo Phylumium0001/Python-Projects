@@ -79,6 +79,27 @@ class Database:
         finally:
             self.close_conn(conn)
 
+    def get_all_url(self):
+        conn, c = None, None
+        try:
+            conn, c = self.setup_conn()
+
+            # Use parameterized query for safe searching
+            c.execute(
+                sql.SQL("SELECT * FROM urls"),
+                (short_url,)
+            )
+            result = c.fetchall()
+            if result:
+                return result
+            else:
+                return None
+        except Exception as e:
+            print(f"[Find URL] : Failed \n\t{e}")
+            return None
+        finally:
+            self.close_conn(conn)
+
 # Note: The `users` table and related functions were removed for brevity,
 # as they were not part of the core URL shortening logic.
 # You can adapt them using the same principles.
