@@ -1,9 +1,9 @@
 # URL shortening service
-from utils.normalize import normalize_url
-from utils.hash_url import generate_hash_value
-from utils.generate_short_url import generate_url
-from utils.user_id import generate_user_id
-from utils.database import Database
+from backend.utils.normalize import normalize_url
+from backend.utils.hash_url import generate_hash_value
+from backend.utils.generate_short_url import generate_url
+from backend.utils.user_id import generate_user_id
+from backend.utils.database import Database
 
 
 def add_new_url(url, db_obj, add_user_id=False):

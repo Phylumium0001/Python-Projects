@@ -2,7 +2,7 @@
 def generate_url(hash, user_id=False):
     # Forms the short url
     # domain/xhh-xhh-xhh-xhh
-    url = "shlk.com/"
+    url = ""
 
     # Seperate hash into four chunks
     # Get first 8 chars of hash
@@ -14,7 +14,7 @@ def generate_url(hash, user_id=False):
 
         # This includes the user id to the short url
         for id, chunk in zip(list(user_id), hash_chunks):
-            if url == "shlk.com/":
+            if url == "":
                 url += f"{id}{chunk}"
                 continue
 
@@ -22,7 +22,7 @@ def generate_url(hash, user_id=False):
 
     else:
         for chunk in hash_chunks:
-            if url == "shlk.com/":
+            if url == "":
                 url += chunk
                 continue
             url += f"-{chunk}"

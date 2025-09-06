@@ -1,100 +1,189 @@
-homepage = """<!DOCTYPE html>
-<html lang="en">
+homepage = """
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shorten Your Link</title>
+    <title>URL Shortener</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 40px;
             background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
             color: #333;
         }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #555;
+            text-align: center;
         }
         input[type="text"] {
-            padding: 0.75rem;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 1rem;
-            width: 300px;
         }
         button {
-            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
             border: none;
             border-radius: 4px;
-            background-color: #007BFF;
-            color: #fff;
-            font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            width: 100%;
+            font-size: 16px;
         }
         button:hover {
             background-color: #0056b3;
         }
-        #result {
-            margin-top: 1rem;
-            word-wrap: break-word;
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #short-url-output {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .url-list-container {
+            margin-top: 40px;
+        }
+        .url-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .url-item:last-child {
+            border-bottom: none;
+        }
+        .url-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .short-code {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1em;
+        }
+        .long-url {
+            color: #666;
+            word-break: break-all;
+        }
+        .visits {
+            font-size: 0.9em;
+            color: #888;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>URL Shortener</h1>
-        <form action="http://localhost/shorten" id="shortenForm" method="post">
-            <input type="text" name="long_url" id="longUrlInput" placeholder="Enter a long URL" required>
+        <form id="url-form">
+            <input type="text" id="long-url" name="long-url" placeholder="Enter a long URL here" required>
             <button type="submit">Shorten</button>
         </form>
-        <div id="result"></div>
+        <div id="result" class="result" style="display:none;">
+            <p>Shortened URL:</p>
+            <a id="short-url-output" href="#"></a>
+        </div>
+        <p id="message"></p>
+        
+        <div class="url-list-container">
+            <h2>All Shortened URLs</h2>
+            <div id="url-list">
+                <!-- URLs will be dynamically added here -->
+            </div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('shortenForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const resultDiv = document.getElementById('result');
-            const longUrl = document.getElementById('longUrlInput').value
-            console.log(longUrl)
-            try{
-                const response = await fetch("/shorten",{
-                    method:'POST',
-                    headers:{
-                        'Content-Type' : 'application/json'
+        const shortenerForm = document.getElementById('url-form');
+        const longUrlInput = document.getElementById('long-url');
+        const messageEl = document.getElementById('message');
+        const resultEl = document.getElementById('result');
+        const shortUrlOutputEl = document.getElementById('short-url-output');
+        const urlListEl = document.getElementById('url-list');
+
+        async function fetchAndDisplayUrls() {
+            try {
+                const response = await fetch('/api/urls');
+                const urls = await response.json();
+                
+                urlListEl.innerHTML = '';
+                if (urls.length === 0) {
+                    urlListEl.innerHTML = '<p style="text-align: center; color: #888;">No URLs shortened yet.</p>';
+                } else {
+                    urls.forEach(url => {
+                        const urlItem = document.createElement('div');
+                        urlItem.className = 'url-item';
+                        urlItem.innerHTML = `
+                            <div class="url-item-info">
+                                <a class="short-code" href="/${url.short_url}" target="_blank">/${url.short_url}</a>
+                                <span class="long-url">${url.long_url}</span>
+                            </div>
+                            <span class="visits">Visits: ${url.visits}</span>
+                        `;
+                        urlListEl.appendChild(urlItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch URLs:", error);
+                urlListEl.innerHTML = '<p style="text-align: center; color: red;">Failed to load URLs.</p>';
+            }
+        }
+
+        shortenerForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const longUrl = longUrlInput.value;
+            
+            messageEl.textContent = '';
+            resultEl.style.display = 'none';
+
+            try {
+                const response = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({long_url:longUrl})
-                })
+                    body: JSON.stringify({ long_url: longUrl })
+                });
 
                 const data = await response.json();
 
-                console.log(data)
-                if (response.ok){
-                    resultDiv.innerHTML = `<p>Your short URL is <a href='${data.short_url.replace("shlk.com/","")}' target='_blank'>${data.short_url}</a></p>`
-                }else{
-                    resultDiv.innerHTML = `<p style="color:red">Error: ${data.detail}</p>`
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Something went wrong');
                 }
 
-            }catch(error){
-            resultDiv.innerHTML= `<p style="color :red;">Failed to connect to the server</p>`
+                shortUrlOutputEl.textContent = `/${data.short_url}`;
+                shortUrlOutputEl.href = `/${data.short_url}`;
+                resultEl.style.display = 'flex';
+                longUrlInput.value = '';
+                
+                // Refresh the list after a new URL is shortened
+                fetchAndDisplayUrls();
+
+            } catch (error) {
+                messageEl.textContent = error.message;
             }
-
-
         });
+        
+        // Initial fetch of all URLs on page load
+        fetchAndDisplayUrls();
     </script>
 </body>
-</html>"""
+</html>
+"""

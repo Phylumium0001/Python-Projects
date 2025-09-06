@@ -8,7 +8,8 @@ class Database:
         # The connection string is read from the environment variable
         self.DATABASE_URL = os.environ.get("DATABASE_URL")
         if not self.DATABASE_URL:
-            raise RuntimeError("DATABASE_URL environment variable not set.")
+            # Fallback for local development
+            self.DATABASE_URL = "postgresql://postgres@localhost/short_url_service"
         self.create_tables()
 
     def setup_conn(self):
@@ -24,12 +25,12 @@ class Database:
         conn, c = None, None
         try:
             conn, c = self.setup_conn()
-
             # Use parameterized queries to create tables securely
             c.execute("""
                 CREATE TABLE IF NOT EXISTS urls (
-                    short_url TEXT PRIMARY KEY,
-                    actual_url TEXT NOT NULL
+                    short_url_code TEXT PRIMARY KEY,
+                    actual_url TEXT NOT NULL,
+                    num_visits INTEGER DEFAULT 0
                 );
             """)
             conn.commit()
@@ -43,10 +44,10 @@ class Database:
         conn, c = None, None
         try:
             conn, c = self.setup_conn()
-
             # IMPORTANT: Use parameterized query to prevent SQL injection
             c.execute(
-                sql.SQL("INSERT INTO urls (short_url, actual_url) VALUES (%s, %s)"),
+                sql.SQL(
+                    "INSERT INTO urls (short_url_code, actual_url) VALUES (%s, %s)"),
                 (short_url, ori_url)
             )
             conn.commit()
@@ -62,15 +63,15 @@ class Database:
         conn, c = None, None
         try:
             conn, c = self.setup_conn()
-
             # Use parameterized query for safe searching
             c.execute(
-                sql.SQL("SELECT actual_url FROM urls WHERE short_url = %s"),
+                sql.SQL("SELECT * FROM urls WHERE short_url_code = %s"),
                 (short_url,)
             )
             result = c.fetchone()
+            # print(result)
             if result:
-                return result[0]
+                return result
             else:
                 return None
         except Exception as e:
@@ -83,23 +84,36 @@ class Database:
         conn, c = None, None
         try:
             conn, c = self.setup_conn()
-
             # Use parameterized query for safe searching
-            c.execute(
-                sql.SQL("SELECT * FROM urls"),
-                (short_url,)
-            )
+            c.execute(sql.SQL("SELECT * FROM urls"))
             result = c.fetchall()
-            if result:
-                return result
-            else:
-                return None
+            # Always return a list, even if it's empty, instead of None
+            print(result)
+            return result if result is not None else []
+
         except Exception as e:
-            print(f"[Find URL] : Failed \n\t{e}")
-            return None
+            print(f"[All Urls]{e}")
+            return []  # Return an empty list on error
         finally:
             self.close_conn(conn)
 
-# Note: The `users` table and related functions were removed for brevity,
-# as they were not part of the core URL shortening logic.
-# You can adapt them using the same principles.
+    def increment_visit_count(self, short_url):
+        conn, c = None, None
+        try:
+            conn, c = self.setup_conn()
+            c.execute(
+                sql.SQL(
+                    "UPDATE urls SET num_visits = num_visits + 1 WHERE short_url_code = %s"),
+                (short_url,)
+            )
+            conn.commit()
+            print(f"[Visit Count] : Incremented count for {short_url}")
+        except Exception as e:
+            print(f"[Visit Count] : Failed to increment count: {e}")
+        finally:
+            self.close_conn(conn)
+
+
+if __name__ == "__main__":
+    db = Database()
+    print(db.get_all_url())
