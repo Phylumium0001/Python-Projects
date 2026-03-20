@@ -16,4 +16,3 @@
   The scripts organizes common files in the directory into their corresponding folders
 
 - ## Finance Tracker
-  
